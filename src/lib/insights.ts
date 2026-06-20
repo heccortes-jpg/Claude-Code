@@ -120,7 +120,7 @@ export function getEmotionChartData(expenses: Expense[]) {
   return Object.entries(counts)
     .map(([id, data]) => {
       const emotion = getEmotion(id)
-      return { name: emotion.label, emoji: emotion.emoji, count: data.count, total: data.total, color: emotion.color }
+      return { id, name: emotion.label, emoji: emotion.emoji, count: data.count, total: data.total, color: emotion.color }
     })
     .sort((a, b) => b.count - a.count)
     .slice(0, 6)

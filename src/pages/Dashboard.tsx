@@ -11,7 +11,8 @@ import {
   getImpulsivePercentage, getTotal, getThisWeekExpenses,
   generateInsight
 } from '../lib/insights'
-import { Plus, TrendingUp, Zap, Layers } from 'lucide-react'
+import { Plus, TrendingUp, Zap } from 'lucide-react'
+import { isUsingDemoData } from '../lib/storage'
 
 function getGreeting(name: string): string {
   const hour = new Date().getHours()
@@ -39,6 +40,7 @@ export function Dashboard() {
   const lastCategory = lastExpense ? getCategory(lastExpense.categoryId) : null
 
   const name = user?.name?.split(' ')[0] ?? 'tú'
+  const usingDemo = isUsingDemoData()
 
   return (
     <Layout>
@@ -84,6 +86,17 @@ export function Dashboard() {
             <p className="text-xs text-valor-muted leading-tight">Gastos impulsivos</p>
           </div>
         </div>
+
+        {/* Demo data notice */}
+        {usingDemo && (
+          <div className="glass-card p-3 border-yellow-500/20 flex items-start gap-2"
+            style={{ borderColor: 'rgba(234,179,8,0.25)', background: 'rgba(234,179,8,0.06)' }}>
+            <span className="text-base flex-shrink-0">🧪</span>
+            <p className="text-xs text-yellow-300/80 leading-relaxed">
+              Estás viendo datos de ejemplo. Registra tu primer gasto real para empezar tu propio mapa emocional.
+            </p>
+          </div>
+        )}
 
         {/* Insight */}
         <InsightCard text={insight} />

@@ -98,7 +98,7 @@ export function History() {
             <div>
               <p className="text-xs font-semibold text-valor-muted uppercase tracking-wider mb-2">Emoción</p>
               <div className="flex flex-wrap gap-2">
-                {EMOTIONS.slice(0, 6).map(em => (
+                {EMOTIONS.map(em => (
                   <button
                     key={em.id}
                     onClick={() => setFilterEmotion(filterEmotion === em.id ? '' : em.id)}
@@ -116,7 +116,7 @@ export function History() {
             <div>
               <p className="text-xs font-semibold text-valor-muted uppercase tracking-wider mb-2">Categoría</p>
               <div className="flex flex-wrap gap-2">
-                {CATEGORIES.slice(0, 6).map(cat => (
+                {CATEGORIES.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => setFilterCategory(filterCategory === cat.id ? '' : cat.id)}
@@ -192,9 +192,10 @@ export function History() {
                       <p className="font-display font-bold text-valor-text">{formatCLP(expense.amount)}</p>
                       <button
                         onClick={() => setDeleteConfirm(expense.id)}
-                        className="mt-1 p-1 text-gray-600 hover:text-red-400 transition-colors"
+                        className="mt-1 w-11 h-11 flex items-center justify-center text-gray-500 hover:text-red-400 transition-colors -mr-2"
+                        aria-label="Eliminar registro"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>

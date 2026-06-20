@@ -8,9 +8,10 @@ import {
   formatCLP, getWeeklyChartData, getEmotionChartData,
   getCategoryChartData, getImpulsivePercentage, generateInsight
 } from '../lib/insights'
+import { getCategory } from '../data/categories'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell
 } from 'recharts'
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -203,23 +204,38 @@ export function Patterns() {
         {/* Emotion + category cross */}
         <div>
           <SectionTitle>Relación emoción · categoría</SectionTitle>
-          <div className="glass-card p-4">
+          <div className="glass-card p-4 space-y-4">
             {emotionData.slice(0, 3).map(em => {
-              const emExpenses = expenses.filter(e => e.emotionId === em.name.toLowerCase() ||
-                e.emotionId === emotionData.find(x => x.name === em.name)?.name)
+              const relatedExpenses = expenses.filter(e => e.emotionId === em.id)
+              const catCounts: Record<string, number> = {}
+              relatedExpenses.forEach(e => {
+                catCounts[e.categoryId] = (catCounts[e.categoryId] ?? 0) + 1
+              })
+              const topCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]).slice(0, 3)
               return (
-                <div key={em.name} className="mb-4 last:mb-0">
+                <div key={em.id}>
                   <div className="flex items-center gap-2 mb-2">
                     <span>{em.emoji}</span>
                     <span className="text-sm font-semibold text-valor-text">{em.name}</span>
                     <span className="text-xs text-valor-muted">({em.count} registros)</span>
                   </div>
+                  <div className="flex flex-wrap gap-1.5 ml-6">
+                    {topCats.map(([catId, count]) => {
+                      const cat = getCategory(catId)
+                      return (
+                        <span key={catId} className="text-xs px-2 py-1 rounded-full"
+                          style={{ background: `${cat.color}20`, color: cat.color }}>
+                          {cat.emoji} {cat.label} ×{count}
+                        </span>
+                      )
+                    })}
+                    {topCats.length === 0 && (
+                      <span className="text-xs text-valor-muted">Sin categoría dominante aún</span>
+                    )}
+                  </div>
                 </div>
               )
             })}
-            <p className="text-xs text-valor-muted text-center">
-              Registra más gastos para ver la relación completa entre emociones y categorías.
-            </p>
           </div>
         </div>
 
@@ -227,9 +243,13 @@ export function Patterns() {
         <div className="glass-card p-5 text-center border-violet-500/30">
           <p className="text-violet-400 font-semibold mb-2">✦ Análisis avanzado en Valor Premium</p>
           <p className="text-xs text-valor-muted mb-4">
-            Momentos del día con más gastos, predicción de patrones, comparación semanal detallada y mucho más.
+            Momentos del día con más gastos, análisis de patrones, comparación semanal detallada y mucho más.
           </p>
-          <button className="btn-primary" style={{ background: 'linear-gradient(135deg, #8B5CF6, #C026D3)' }}>
+          <button
+            onClick={() => navigate('/perfil')}
+            className="btn-primary"
+            style={{ background: 'linear-gradient(135deg, #8B5CF6, #C026D3)' }}
+          >
             Saber más — desde $2.990 CLP/mes
           </button>
         </div>

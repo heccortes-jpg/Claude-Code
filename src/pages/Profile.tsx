@@ -144,7 +144,7 @@ export function Profile() {
 
         <div className="pb-4">
           <Logo size="sm" />
-          <p className="text-xs text-gray-700 mt-1">v0.1.0 — MVP beta</p>
+          <p className="text-xs text-gray-500 mt-1">v0.1.0 — MVP beta</p>
         </div>
       </div>
 

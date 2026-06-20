@@ -29,23 +29,31 @@ export function Register() {
     setStep('category')
   }
 
+  const [saveError, setSaveError] = useState('')
+
   const handleSave = async () => {
     setSaving(true)
-    const num = parseInt(amount.replace(/\D/g, ''))
-    addExpense({
-      id: generateId(),
-      amount: num,
-      categoryId: categoryId!,
-      emotionId: emotionId!,
-      isImpulsive: isImpulsive ?? false,
-      trigger: trigger.trim() || undefined,
-      note: note.trim() || undefined,
-      date: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    })
-    await new Promise(r => setTimeout(r, 500))
-    setSaving(false)
-    setStep('success')
+    setSaveError('')
+    try {
+      const num = parseInt(amount.replace(/\D/g, ''))
+      addExpense({
+        id: generateId(),
+        amount: num,
+        categoryId: categoryId!,
+        emotionId: emotionId!,
+        isImpulsive: isImpulsive ?? false,
+        trigger: trigger.trim() || undefined,
+        note: note.trim() || undefined,
+        date: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      })
+      await new Promise(r => setTimeout(r, 400))
+      setStep('success')
+    } catch {
+      setSaveError('No se pudo guardar el gasto. Intenta de nuevo.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const formatDisplayAmount = (val: string) => {
@@ -262,6 +270,7 @@ export function Register() {
                 />
               </div>
 
+              {saveError && <p className="text-red-400 text-sm mb-2">{saveError}</p>}
               <button
                 onClick={handleSave}
                 disabled={saving}

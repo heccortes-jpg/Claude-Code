@@ -23,6 +23,11 @@ export function saveUser(user: UserProfile): void {
 export function deleteUser(): void {
   localStorage.removeItem(KEYS.user)
   localStorage.removeItem(KEYS.expenses)
+  localStorage.removeItem(KEYS.source)
+}
+
+export function isUsingDemoData(): boolean {
+  return localStorage.getItem(KEYS.expenses) === null
 }
 
 export function getExpenses(): Expense[] {
