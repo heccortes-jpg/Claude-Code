@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Logo } from '../components/Logo'
 import { getUser, saveUser, generateId } from '../lib/storage'
+import { track } from '../lib/analytics'
 import type { OnboardingGoal, OnboardingFrequency, OnboardingTone } from '../types'
 import { ChevronRight } from 'lucide-react'
 
@@ -45,6 +46,7 @@ export function Onboarding() {
 
   const handleComplete = () => {
     const existing = getUser()
+    track('onboarding_complete', { goal: goal ?? 'otro', tone: tone ?? 'cercano' })
     saveUser({
       id: existing?.id ?? generateId(),
       name: name.trim() || 'Usuario',

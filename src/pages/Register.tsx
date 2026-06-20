@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout'
 import { CATEGORIES } from '../data/categories'
 import { EMOTIONS } from '../data/emotions'
 import { addExpense, generateId } from '../lib/storage'
+import { track } from '../lib/analytics'
 import type { CategoryId, EmotionId } from '../types'
 import { ChevronLeft, CheckCircle } from 'lucide-react'
 
@@ -20,6 +21,7 @@ export function Register() {
   const [trigger, setTrigger] = useState('')
   const [note, setNote] = useState('')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const handleAmountNext = () => {
     const num = parseInt(amount.replace(/\D/g, ''))
@@ -28,8 +30,6 @@ export function Register() {
     setAmountError('')
     setStep('category')
   }
-
-  const [saveError, setSaveError] = useState('')
 
   const handleSave = async () => {
     setSaving(true)
@@ -47,6 +47,11 @@ export function Register() {
         date: new Date().toISOString(),
         createdAt: new Date().toISOString(),
       })
+      track('expense_saved', {
+        emotionId: emotionId!,
+        categoryId: categoryId!,
+        isImpulsive: isImpulsive ?? false,
+      })
       await new Promise(r => setTimeout(r, 400))
       setStep('success')
     } catch {
@@ -54,6 +59,18 @@ export function Register() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const resetForm = () => {
+    setStep('amount')
+    setAmount('')
+    setAmountError('')
+    setCategoryId(null)
+    setEmotionId(null)
+    setIsImpulsive(null)
+    setTrigger('')
+    setNote('')
+    setSaveError('')
   }
 
   const formatDisplayAmount = (val: string) => {
@@ -64,6 +81,8 @@ export function Register() {
 
   const selectedEmotion = emotionId ? EMOTIONS.find(e => e.id === emotionId) : null
   const selectedCategory = categoryId ? CATEGORIES.find(c => c.id === categoryId) : null
+
+  const stepIndex = { amount: 0, category: 1, emotion: 2, details: 3 }
 
   if (step === 'success') {
     return (
@@ -78,8 +97,8 @@ export function Register() {
             {selectedEmotion ? `Notamos que te sentías ${selectedEmotion.label.toLowerCase()}.` : ''}
           </p>
           {selectedEmotion && (
-            <div className="glass-card p-4 w-full mb-8">
-              <p className="text-sm text-valor-muted">
+            <div className="glass-card p-4 w-full mb-8 text-left">
+              <p className="text-sm text-valor-muted leading-relaxed">
                 {selectedEmotion.id === 'estresado' || selectedEmotion.id === 'ansioso'
                   ? 'Registrar cuando estás estresado/a es un acto de autoconciencia. No hay nada malo en eso.'
                   : selectedEmotion.id === 'feliz'
@@ -89,7 +108,7 @@ export function Register() {
             </div>
           )}
           <div className="w-full space-y-3">
-            <button onClick={() => { setStep('amount'); setAmount(''); setCategoryId(null); setEmotionId(null); setIsImpulsive(null); setTrigger(''); setNote('') }} className="btn-primary">
+            <button onClick={resetForm} className="btn-primary">
               Registrar otro gasto
             </button>
             <button onClick={() => navigate('/dashboard')} className="btn-secondary">
@@ -113,20 +132,19 @@ export function Register() {
               else if (step === 'emotion') setStep('category')
               else if (step === 'details') setStep('emotion')
             }}
-            className="w-10 h-10 rounded-full glass-card flex items-center justify-center"
+            className="w-11 h-11 rounded-full glass-card flex items-center justify-center flex-shrink-0"
+            aria-label="Volver"
           >
             <ChevronLeft size={20} className="text-valor-muted" />
           </button>
-          <div className="flex-1">
-            <div className="flex gap-1">
-              {(['amount', 'category', 'emotion', 'details'] as const).map((s, i) => (
-                <div key={s} className={`flex-1 h-1 rounded-full transition-all ${
-                  ['amount', 'category', 'emotion', 'details'].indexOf(step) >= i
-                    ? 'bg-valor-gradient'
-                    : 'bg-valor-border'
-                }`} />
-              ))}
-            </div>
+          <div className="flex-1 flex gap-1.5">
+            {(['amount', 'category', 'emotion', 'details'] as const).map((s, i) => (
+              <div key={s} className={`flex-1 h-1 rounded-full transition-all ${
+                (stepIndex[step as keyof typeof stepIndex] ?? 0) >= i
+                  ? 'bg-valor-gradient'
+                  : 'bg-valor-border'
+              }`} />
+            ))}
           </div>
         </div>
 
@@ -169,12 +187,12 @@ export function Register() {
                   <button
                     key={cat.id}
                     onClick={() => { setCategoryId(cat.id); setStep('emotion') }}
-                    className={`glass-card p-4 flex items-center gap-3 transition-all ${
+                    className={`glass-card p-4 flex items-center gap-3 transition-all text-left ${
                       categoryId === cat.id ? 'border-violet-500 bg-violet-500/10' : ''
                     }`}
                   >
                     <span className="text-2xl">{cat.emoji}</span>
-                    <span className="text-sm font-medium text-valor-text text-left">{cat.label}</span>
+                    <span className="text-sm font-medium text-valor-text">{cat.label}</span>
                   </button>
                 ))}
               </div>
@@ -192,7 +210,7 @@ export function Register() {
                     key={em.id}
                     onClick={() => { setEmotionId(em.id); setStep('details') }}
                     className={`glass-card p-4 flex items-center gap-3 transition-all ${
-                      emotionId === em.id ? 'border-violet-500 bg-violet-500/10' : ''
+                      emotionId === em.id ? 'bg-violet-500/10' : ''
                     }`}
                     style={emotionId === em.id ? { borderColor: em.color } : {}}
                   >
@@ -243,7 +261,8 @@ export function Register() {
               {/* Trigger */}
               <div className="mb-4">
                 <label className="text-sm font-semibold text-valor-text block mb-2">
-                  ¿Qué detonó esta compra? <span className="text-valor-muted font-normal">(opcional)</span>
+                  ¿Qué detonó esta compra?{' '}
+                  <span className="text-valor-muted font-normal">(opcional)</span>
                 </label>
                 <input
                   type="text"
@@ -256,9 +275,10 @@ export function Register() {
               </div>
 
               {/* Note */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <label className="text-sm font-semibold text-valor-text block mb-2">
-                  Nota <span className="text-valor-muted font-normal">(opcional)</span>
+                  Nota{' '}
+                  <span className="text-valor-muted font-normal">(opcional)</span>
                 </label>
                 <textarea
                   value={note}
@@ -270,7 +290,10 @@ export function Register() {
                 />
               </div>
 
-              {saveError && <p className="text-red-400 text-sm mb-2">{saveError}</p>}
+              {saveError && (
+                <p className="text-red-400 text-sm mb-3">{saveError}</p>
+              )}
+
               <button
                 onClick={handleSave}
                 disabled={saving}

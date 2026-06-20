@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { EmptyState } from '../components/EmptyState'
@@ -9,6 +9,7 @@ import {
   getCategoryChartData, getImpulsivePercentage, generateInsight
 } from '../lib/insights'
 import { getCategory } from '../data/categories'
+import { track } from '../lib/analytics'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -39,6 +40,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export function Patterns() {
   const navigate = useNavigate()
   const expenses = getExpenses()
+
+  useEffect(() => { track('patterns_viewed') }, [])
 
   const weeklyData = useMemo(() => getWeeklyChartData(expenses), [expenses])
   const emotionData = useMemo(() => getEmotionChartData(expenses), [expenses])

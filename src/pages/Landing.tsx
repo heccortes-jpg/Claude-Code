@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Logo } from '../components/Logo'
 import { getUser, saveSource } from '../lib/storage'
+import { track } from '../lib/analytics'
 import { ChevronRight, Shield, BarChart2, Heart } from 'lucide-react'
 
 export function Landing() {
@@ -11,6 +12,7 @@ export function Landing() {
     const params = new URLSearchParams(window.location.search)
     const de = params.get('de')
     if (de) saveSource(de)
+    track('landing_view', de ? { source: de } : undefined)
 
     const user = getUser()
     if (user?.onboardingCompleted) navigate('/dashboard', { replace: true })
@@ -21,6 +23,7 @@ export function Landing() {
     if (user?.onboardingCompleted) {
       navigate('/dashboard')
     } else {
+      track('onboarding_start')
       navigate('/onboarding')
     }
   }

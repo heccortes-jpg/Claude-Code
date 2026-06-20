@@ -6,6 +6,7 @@ import { Register } from './pages/Register'
 import { History } from './pages/History'
 import { Patterns } from './pages/Patterns'
 import { Profile } from './pages/Profile'
+import { NotFound } from './pages/NotFound'
 import { getUser } from './lib/storage'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -25,7 +26,7 @@ export default function App() {
         <Route path="/historial" element={<RequireAuth><History /></RequireAuth>} />
         <Route path="/patrones" element={<RequireAuth><Patterns /></RequireAuth>} />
         <Route path="/perfil" element={<RequireAuth><Profile /></RequireAuth>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

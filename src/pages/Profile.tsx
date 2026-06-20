@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { Logo } from '../components/Logo'
 import { getUser, deleteUser } from '../lib/storage'
+import { track } from '../lib/analytics'
 import { getExpenses } from '../lib/storage'
 import { formatCLP, getTotal } from '../lib/insights'
 import { Shield, Trash2, Lock, Eye, Database, ChevronRight, ExternalLink } from 'lucide-react'
@@ -18,6 +19,7 @@ export function Profile() {
   const totalExpenses = expenses.length
 
   const handleDeleteAccount = () => {
+    track('account_deleted')
     deleteUser()
     navigate('/', { replace: true })
   }
@@ -74,10 +76,18 @@ export function Profile() {
             ))}
           </div>
           <div className="flex gap-3">
-            <button className="btn-primary flex-1" style={{ minHeight: '44px', padding: '10px' }}>
+            <button
+              onClick={() => track('premium_interest', { plan: 'monthly' })}
+              className="btn-primary flex-1"
+              style={{ minHeight: '44px', padding: '10px' }}
+            >
               $2.990/mes
             </button>
-            <button className="btn-secondary flex-1" style={{ minHeight: '44px', padding: '10px' }}>
+            <button
+              onClick={() => track('premium_interest', { plan: 'founder' })}
+              className="btn-secondary flex-1"
+              style={{ minHeight: '44px', padding: '10px' }}
+            >
               $14.990 fundador
             </button>
           </div>
