@@ -6,7 +6,7 @@ import { getUser, deleteUser } from '../lib/storage'
 import { track } from '../lib/analytics'
 import { getExpenses } from '../lib/storage'
 import { formatCLP, getTotal } from '../lib/insights'
-import { Shield, Trash2, Lock, Eye, Database, ChevronRight, ExternalLink } from 'lucide-react'
+import { Shield, Trash2, Lock, Eye, Database, CheckCircle2 } from 'lucide-react'
 
 export function Profile() {
   const navigate = useNavigate()
@@ -14,6 +14,7 @@ export function Profile() {
   const expenses = getExpenses()
   const [showDeleteAccount, setShowDeleteAccount] = useState(false)
   const [deleteConfirmed, setDeleteConfirmed] = useState(false)
+  const [premiumInterestSent, setPremiumInterestSent] = useState(false)
 
   const totalSpent = getTotal(expenses)
   const totalExpenses = expenses.length
@@ -75,23 +76,35 @@ export function Profile() {
               </div>
             ))}
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => track('premium_interest', { plan: 'monthly' })}
-              className="btn-primary flex-1"
-              style={{ minHeight: '44px', padding: '10px' }}
-            >
-              $2.990/mes
-            </button>
-            <button
-              onClick={() => track('premium_interest', { plan: 'founder' })}
-              className="btn-secondary flex-1"
-              style={{ minHeight: '44px', padding: '10px' }}
-            >
-              $14.990 fundador
-            </button>
-          </div>
-          <p className="text-xs text-valor-muted text-center mt-2">Sin pagos reales aún — registra tu interés</p>
+          {premiumInterestSent ? (
+            <div className="flex flex-col items-center gap-2 py-2 scale-enter">
+              <CheckCircle2 size={28} className="text-violet-400" />
+              <p className="text-sm font-semibold text-valor-text">¡Interés registrado!</p>
+              <p className="text-xs text-valor-muted text-center">
+                Serás de las primeras personas en saber cuando lancemos Valor Premium.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { track('premium_interest', { plan: 'monthly' }); setPremiumInterestSent(true) }}
+                  className="btn-primary flex-1"
+                  style={{ minHeight: '44px', padding: '10px' }}
+                >
+                  $2.990/mes
+                </button>
+                <button
+                  onClick={() => { track('premium_interest', { plan: 'founder' }); setPremiumInterestSent(true) }}
+                  className="btn-secondary flex-1"
+                  style={{ minHeight: '44px', padding: '10px' }}
+                >
+                  $14.990 fundador
+                </button>
+              </div>
+              <p className="text-xs text-valor-muted text-center mt-2">Sin pagos reales aún — registra tu interés</p>
+            </>
+          )}
         </div>
 
         {/* Privacy section */}
