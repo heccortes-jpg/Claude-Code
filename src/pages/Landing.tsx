@@ -29,7 +29,7 @@ export function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-valor-bg flex flex-col relative overflow-hidden max-w-md mx-auto">
+    <div className="min-h-screen bg-valor-bg flex flex-col relative overflow-hidden max-w-md mx-auto page-enter">
       {/* Background gradients */}
       <div className="absolute top-0 right-0 w-72 h-72 rounded-full opacity-10 blur-3xl"
         style={{ background: 'radial-gradient(circle, #8B5CF6, transparent)' }} />
@@ -52,13 +52,13 @@ export function Landing() {
         </p>
 
         {/* Features */}
-        <div className="space-y-3 mb-10">
+        <div className="space-y-3 mb-10 stagger">
           {[
             { icon: <Heart size={18} />, text: 'Registra gastos y emociones en segundos' },
             { icon: <BarChart2 size={18} />, text: 'Descubre patrones que no sabías que tenías' },
             { icon: <Shield size={18} />, text: 'Tus datos son tuyos. Siempre.' },
           ].map((item, i) => (
-            <div key={i} className="glass-card p-4 flex items-center gap-3">
+            <div key={i} className="glass-card p-4 flex items-center gap-3 page-enter-fast">
               <div className="w-8 h-8 rounded-full bg-valor-gradient flex items-center justify-center flex-shrink-0 text-white">
                 {item.icon}
               </div>

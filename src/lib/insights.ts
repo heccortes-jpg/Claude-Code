@@ -10,6 +10,34 @@ export function formatCLP(amount: number): string {
   }).format(amount)
 }
 
+export function formatAmountInput(raw: string): string {
+  const digits = raw.replace(/\D/g, '')
+  if (!digits) return ''
+  return new Intl.NumberFormat('es-CL').format(parseInt(digits))
+}
+
+export function formatRelativeDate(iso: string): string {
+  const date = new Date(iso)
+  const now = new Date()
+  const todayStr = now.toDateString()
+  const yesterday = new Date(now)
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yestStr = yesterday.toDateString()
+
+  const timeStr = date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })
+
+  if (date.toDateString() === todayStr) return `Hoy · ${timeStr}`
+  if (date.toDateString() === yestStr) return `Ayer · ${timeStr}`
+
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+  if (diffDays < 7) {
+    const dayName = date.toLocaleDateString('es-CL', { weekday: 'long' })
+    return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} · ${timeStr}`
+  }
+
+  return date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short' }) + ` · ${timeStr}`
+}
+
 export function getTopEmotion(expenses: Expense[]): string | null {
   if (!expenses.length) return null
   const counts: Record<string, number> = {}

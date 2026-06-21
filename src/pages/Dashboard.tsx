@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { InsightCard } from '../components/InsightCard'
 import { Logo } from '../components/Logo'
+import { InstallBanner } from '../components/InstallBanner'
 import { getUser, getExpenses } from '../lib/storage'
 import { getEmotion } from '../data/emotions'
 import { getCategory } from '../data/categories'
@@ -44,7 +45,7 @@ export function Dashboard() {
 
   return (
     <Layout>
-      <div className="px-5 pt-12 space-y-5">
+      <div className="px-5 pt-12 space-y-5 page-enter">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -86,6 +87,9 @@ export function Dashboard() {
             <p className="text-xs text-valor-muted leading-tight">Gastos impulsivos</p>
           </div>
         </div>
+
+        {/* Install banner */}
+        <InstallBanner />
 
         {/* Demo data notice */}
         {usingDemo && (

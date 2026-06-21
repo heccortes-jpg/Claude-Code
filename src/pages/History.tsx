@@ -7,14 +7,9 @@ import { getEmotion } from '../data/emotions'
 import { getCategory } from '../data/categories'
 import { EMOTIONS } from '../data/emotions'
 import { CATEGORIES } from '../data/categories'
-import { formatCLP } from '../lib/insights'
+import { formatCLP, formatRelativeDate } from '../lib/insights'
 import type { EmotionId, CategoryId } from '../types'
 import { Search, Trash2, Zap, X } from 'lucide-react'
-
-function formatDate(iso: string): string {
-  const date = new Date(iso)
-  return date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-}
 
 export function History() {
   const navigate = useNavigate()
@@ -159,12 +154,12 @@ export function History() {
             action={hasFilters ? { label: 'Limpiar filtros', onClick: () => { setFilterEmotion(''); setFilterCategory(''); setFilterImpulsive('all'); setSearch('') } } : undefined}
           />
         ) : (
-          <div className="space-y-3">
-            {filtered.map(expense => {
+          <div className="space-y-3 stagger">
+            {filtered.map((expense, idx) => {
               const emotion = getEmotion(expense.emotionId)
               const category = getCategory(expense.categoryId)
               return (
-                <div key={expense.id} className="glass-card p-4">
+                <div key={expense.id} className="glass-card p-4 page-enter-fast" style={{ animationDelay: `${Math.min(idx, 5) * 50}ms` }}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div
@@ -182,7 +177,7 @@ export function History() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-valor-muted">{emotion.label} · {formatDate(expense.date)}</p>
+                        <p className="text-xs text-valor-muted">{emotion.label} · {formatRelativeDate(expense.date)}</p>
                         {expense.trigger && (
                           <p className="text-xs text-valor-muted mt-1 truncate">"{expense.trigger}"</p>
                         )}
